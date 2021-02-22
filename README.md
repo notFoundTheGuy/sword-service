@@ -1,2 +1,3 @@
 # sword-service
-node + MongoDB
+
+node.js + MongoDB
