@@ -7,5 +7,6 @@ exports.connect = function () {
 		console.log('数据库连接成功');
 		global.dbSword = db.db('sword');
 		global.articles = dbSword.collection('articles');
+		global.directory = dbSword.collection('directory');
 	});
 };

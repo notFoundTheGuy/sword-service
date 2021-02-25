@@ -1,41 +1,32 @@
-const http = require('http');
-const url = require('url');
-const querystring = require('querystring');
-const util = require('util');
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
 
-const db = require('./db/index')
-exports.start = function (route) {
-	function onRequest(req, res) {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization');
+const db = require('./db/index');
+const articlesRouter = require('./router/articles');
+const directoryRouter = require('./router/directory');
 
-		let pathname = url.parse(req.url).pathname;
+// 允许跨域
+app.all('*', (req, res, next) => {
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+	res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS');
+	res.header('Content-Type', 'application/json;charset=utf-8');
+	next();
+});
 
-        console.log(req.method);
-        if (req.method === 'POST') {
-            // post请求解析
-            let postParams = '';
-        
-            // 通过req的data事件监听函数，每当接受到请求体的数据，就累加到post变量中
-            req.on('data', function(chunk){    
-                postParams += chunk;
-            });
-        
-            // 在end事件触发后，通过querystring.parse将post解析为真正的POST请求格式，然后向客户端返回。
-            req.on('end', function(){
-                postParams = querystring.parse(postParams);
-                route(pathname, postParams, res);
-            });
-        } else {
-             // 解析 url 参数,get请求
-            let getParams = url.parse(req.url, true).query;
-            route(pathname, getParams, res);
-        }
-	}
+//对JSON请求体解析中间件
+app.use(bodyParser.json());
+//对urlencoded请求体解析中间件,extended:true 高级模式 false:普通
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(articlesRouter);
+app.use(directoryRouter);
 
-	http.createServer(onRequest).listen(9999);
-    // 连接数据库
-    db.connect();
-	console.log('Server running!!!!!');
+
+exports.start = function () {
+	app.listen(9999, function () {
+		console.log('Server running!!!!!');
+		// 连接数据库
+		db.connect();
+	});
 };

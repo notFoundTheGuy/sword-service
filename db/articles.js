@@ -1,8 +1,6 @@
 const util = require('util');
 
 exports.add = function (params) {
-	// console.warn(params);
-	// console.log(util.inspect(params));
 	return global.articles
 		.insertOne({
 			test: util.inspect(params),
