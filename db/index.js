@@ -6,7 +6,7 @@ exports.connect = function () {
 		if (err) throw err;
 		console.log('数据库连接成功');
 		global.dbSword = db.db('sword');
-		global.articles = dbSword.collection('articles');
+		global.article = dbSword.collection('article');
 		global.directory = dbSword.collection('directory');
 	});
 };
